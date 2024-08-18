@@ -1,3 +1,7 @@
+* {
+  margin: 0;
+  padding: 0;
+}
 body {
   background: url(https://img.freepik.com/free-vector/sky-background-video-conferencing_23-2148639325.jpg?semt=ais_hybrid);
   height: 100vh;
@@ -17,4 +21,12 @@ body {
   padding: 50px;
   border-radius: 20px;
   background-color: lavender;
+}
+.menu-container Button {
+  margin-top: 20px;
+  margin-right: 10px;
+}
+
+.menu-container Button:hover {
+  background-color: orange;
 }
