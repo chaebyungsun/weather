@@ -11,10 +11,8 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [city, setCity] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // 에러 상태 추가
-
+  const [apiError, setAPIError] = useState("");
   const cities = ["paris", "new york", "tokyo", "seoul"];
-
   const getCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       let lat = position.coords.latitude;
@@ -24,45 +22,35 @@ function App() {
   };
 
   const getWeatherByCurrentLocation = async (lat, lon) => {
-    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=b22e1ca10070028e4a443610cfd76e33&units=metric`;
     try {
+      let url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=b22e1ca10070028e4a443610cfd76e33&units=metric`;
       setLoading(true);
-      setError(null); // 에러 초기화
       let response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch weather data");
-      }
       let data = await response.json();
       setWeather(data);
-    } catch (error) {
-      setError(error.message); // 에러 상태 설정
-      console.error("Error fetching weather data:", error);
-    } finally {
+      setLoading(false);
+    } catch (err) {
+      setAPIError(err.message);
       setLoading(false);
     }
   };
-
   const getWeatherByCity = async () => {
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=b22e1ca10070028e4a443610cfd76e33&units=metric`;
     try {
+      let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=b22e1ca10070028e4a443610cfd76e33&units=metric`;
       setLoading(true);
-      setError(null); // 에러 초기화
       let response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch weather data");
-      }
       let data = await response.json();
       setWeather(data);
-    } catch (error) {
-      setError(error.message); // 에러 상태 설정
-      console.error("Error fetching weather data:", error);
-    } finally {
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setAPIError(err.message);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (city === "") {
+    if (city == "") {
       getCurrentLocation();
     } else {
       getWeatherByCity();
@@ -76,18 +64,13 @@ function App() {
       setCity(city);
     }
   };
-
   return (
     <div>
       {loading ? (
         <div className="container">
           <ClipLoader color={"#ffffff"} loading={loading} size={150} />
         </div>
-      ) : error ? (
-        <div className="container">
-          <p>Error: {error}</p> {/* 에러 메시지 표시 */}
-        </div>
-      ) : (
+      ) : !apiError ? (
         <div className="container">
           <WeatherBox weather={weather} />
           <WeatherButton
@@ -96,6 +79,8 @@ function App() {
             selectedCity={city}
           />
         </div>
+      ) : (
+        apiError
       )}
     </div>
   );
